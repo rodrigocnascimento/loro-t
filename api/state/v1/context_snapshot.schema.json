@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loro-t.local/api/state/v1/context_snapshot.schema.json",
+  "title": "Context Snapshot (v1)",
+  "description": "Contrato de snapshot agregado consumido por TUI/CLI.",
+  "type": "object",
+  "required": [
+    "version",
+    "timestamp",
+    "active_project",
+    "active_buffer",
+    "recent_events"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Versão do contrato de snapshot (ex.: 1.0).",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "Momento em que o daemon montou o snapshot (RFC3339).",
+      "format": "date-time"
+    },
+    "active_project": {
+      "type": "object",
+      "required": ["root"],
+      "properties": {
+        "root": { "type": "string" },
+        "name": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "active_buffer": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string" },
+        "buffer_id": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "recent_events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "source", "timestamp"],
+        "properties": {
+          "type": { "type": "string" },
+          "source": { "type": "string" },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "summary": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "default": []
+    }
+  },
+  "additionalProperties": false
+}
