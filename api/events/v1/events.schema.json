@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loro-t.local/api/events/v1/events.schema.json",
+  "title": "Daemon Incoming Events (v1)",
+  "description": "Contrato para mensagens recebidas pelo daemon.",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/BufEnterEvent" },
+    { "$ref": "#/$defs/ProjectSwitchEvent" }
+  ],
+  "$defs": {
+    "EventBase": {
+      "type": "object",
+      "required": ["version", "source", "timestamp", "type"],
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Versão do contrato do payload (ex.: 1.0).",
+          "pattern": "^[0-9]+\\.[0-9]+$"
+        },
+        "source": {
+          "type": "string",
+          "description": "Origem da integração emissora (ex.: nvim, wezterm).",
+          "minLength": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Momento de emissão no formato RFC3339.",
+          "format": "date-time"
+        },
+        "type": {
+          "type": "string",
+          "description": "Tipo discriminador do evento."
+        }
+      },
+      "additionalProperties": false
+    },
+    "BufEnterEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/EventBase" },
+        {
+          "type": "object",
+          "required": ["path", "buffer_id"],
+          "properties": {
+            "type": { "const": "BufEnterEvent" },
+            "path": {
+              "type": "string",
+              "description": "Caminho do arquivo aberto no buffer."
+            },
+            "buffer_id": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Identificador numérico do buffer na origem."
+            },
+            "project_root": {
+              "type": "string",
+              "description": "Raiz do projeto inferida no cliente emissor."
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ProjectSwitchEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/EventBase" },
+        {
+          "type": "object",
+          "required": ["project_root"],
+          "properties": {
+            "type": { "const": "ProjectSwitchEvent" },
+            "project_root": {
+              "type": "string",
+              "description": "Nova raiz de projeto ativa."
+            },
+            "workspace_name": {
+              "type": "string",
+              "description": "Nome amigável do workspace ativo."
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}
